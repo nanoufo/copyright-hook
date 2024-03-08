@@ -1,0 +1,35 @@
+inherits:
+  - duplicated
+
+strictness: veryhigh
+max-line-length: 110
+doc-warnings: false
+
+pylint:
+  disable:
+    - too-many-arguments
+    - too-many-statements
+    - too-many-locals
+    - too-many-branches
+    - too-many-nested-blocks
+    - too-many-return-statements
+    - too-few-public-methods
+
+pycodestyle:
+  disable:
+    - E501 # line too long
+pydocstyle:
+  disable:
+    - D202 # no blank lines after function docstring
+
+bandit:
+  run: true
+
+mypy:
+  run: true
+
+pyroma:
+  run: true
+
+mccabe:
+  run: false
