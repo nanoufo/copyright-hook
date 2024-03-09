@@ -139,7 +139,11 @@ def run_copyright_updater(args_list: List[str], *, now: Optional[datetime.dateti
 
         # Check copyright header is correct
         full_path = repo.root / rel_path
-        content = Path(full_path).read_text("utf-8")
+        try:
+            content = Path(full_path).read_text("utf-8")
+        except UnicodeDecodeError:
+            print_verbose(f"'{rel_path}': is not valid utf-8 text file, skipping")
+            continue
         error_comment, content = update_file(
             content,
             last_year=expected_year,
