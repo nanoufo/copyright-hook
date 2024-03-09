@@ -88,6 +88,8 @@ def temporary_repository() -> Iterator[TestRepository]:
         repo_root = Path(tempdir_path / "repo")
         repo_root.mkdir()
         subprocess.run(["git", "init", "-b", "main"], cwd=repo_root)
+        subprocess.run(["git", "config", "user.name", "test"], cwd=repo_root)
+        subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_root)
         yield TestRepository(repo_root)
 
 
