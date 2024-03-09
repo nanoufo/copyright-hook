@@ -1,19 +1,34 @@
 # copyright-hook
 This is a pre-commit hook that updates the years in copyright headers in source files. It uses the git log to find out when each file was updated. Please note that file movements are not viewed as modifications.
 
-## Usage with pre-commit:
+## Quick start
+Create `.pre-commit-config.yaml`:
 ```yaml
+repos:
   - repo: https://github.com/nanoufo/copyright-hook
-    rev: <commit ID>
+    rev: v1.0.0
     hooks:
       - id: update-copyright
-        # --required, --verbose, --dry-run, --config FILE
-        args: []
-        # Define the files to be processed by this hook
-        # For more details, see https://pre-commit.com/filtering-files-with-types
-        types_or: ["c++", "cmake"]
 ```
-
+Create `.copyright-updater.yaml`:
+```yaml
+# Adjust pattern to your needs
+pattern: ' Copyright {years} MyProject contributors (see AUTHORS)'
+```
+Run this hook on all files to fix outdated headers:
+```
+pre-commit run update-copyright -a
+```
+Look at the results:
+```bash
+$ git diff
+```
+```diff
+...
+-# Copyright 2009-2023 MyProject contributors (see AUTHORS)
++# Copyright 2009-2024 MyProject contributors (see AUTHORS)
+...
+```
 
 ## Args:
 | Option | Description |
@@ -33,17 +48,19 @@ pattern: ' Copyright {years} MyProject contributors (see AUTHORS)'
 # This allows you to disregard files modified prior to the provided date
 # This is particularly useful for the `pre-commit run --all-files` command when you don't want to update a large number 
 # of old files with the incorrect year in the copyright headers.
+# Also a recent date here speeds up this hook.
 ignore_commits_before: 2024-01-01
 ```
 
 ## Running in CI/CD
 ### Running with Github actions
-Remember to fetch the git history.
 ```yaml
 - uses: actions/checkout@v4
   with:
-    fetch-depth: 0
+    fetch-depth: 0 # Important!
+- uses: actions/setup-python@v5
+- uses: pre-commit/action@v3.0.1
 ```
 
 ### Running with [pre-commit.ci](pre-commit.ci)
-pre-commit.ci doesn't fetch history so it is impossible to use it with this hook.
+pre-commit.ci doesn't fetch git history so it is impossible to use it with this hook.
