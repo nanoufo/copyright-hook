@@ -54,24 +54,43 @@ class NotGitRepositoryException(Exception):
     pass
 
 
+class GitCallException(Exception):
+    def __init__(self, comment: str, return_code: Optional[int] = None):
+        super().__init__(comment)
+        self.return_code = return_code
+        self.comment = comment
+
+
+class GitMissingException(GitCallException):
+    def __init__(self) -> None:
+        super().__init__("git not found in PATH")
+
+
 class GitRepository:
     def __init__(self, directory: Union[str, Path]) -> None:
         self.root = Path(directory)
         try:
             self.root = Path(self.run_command(["git", "rev-parse", "--show-toplevel"]))
-        except subprocess.CalledProcessError as exc:
+        except GitMissingException:
+            raise
+        except GitCallException as exc:
             raise NotGitRepositoryException(str(directory)) from exc
 
     def run_command(self, args: List[str]) -> str:
-        out = subprocess.run(
-            args,
-            check=True,
-            encoding="utf-8",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=str(self.root),
-        ).stdout  # nosec
-        return out.removesuffix("\n")
+        try:
+            out = subprocess.run(
+                args,
+                check=True,
+                encoding="utf-8",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=str(self.root),
+            ).stdout  # nosec
+            return out.removesuffix("\n")
+        except FileNotFoundError as exc:
+            raise GitMissingException() from exc
+        except subprocess.CalledProcessError as exc:
+            raise GitCallException(f"git exited with {exc.returncode}: {exc.stderr.strip()}") from exc
 
     def command_fails(self, args: List[str]) -> bool:
         result = subprocess.run(

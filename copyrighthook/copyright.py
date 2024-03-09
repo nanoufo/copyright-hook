@@ -7,7 +7,12 @@ from pathlib import Path, PurePath
 from typing import Optional, Dict, Sequence, List, Union, Callable, Iterable
 
 from copyrighthook.config import CopyrightConfig
-from copyrighthook.git_utilities import GitCommitInfo, GitRepository, NotGitRepositoryException
+from copyrighthook.git_utilities import (
+    GitCommitInfo,
+    GitRepository,
+    NotGitRepositoryException,
+    GitCallException,
+)
 from copyrighthook.years_pattern import YearsPattern
 
 NO_CONFIG_FOUND = "no configuration file found"
@@ -221,10 +226,14 @@ def update_file(
 def main() -> None:
     try:
         if run_copyright_updater(sys.argv[1:]):
-            sys.exit(2)
+            sys.exit(128)
     except FatalException as exc:
         print(exc.full_message)
         sys.exit(1)
+    except GitCallException as exc:
+        exit_code_comment = f" (exit code {exc.return_code})" if exc.return_code else ""
+        print(f"failed to run git{exit_code_comment}: {exc.comment}")
+        sys.exit(2)
 
 
 if __name__ == "__main__":
