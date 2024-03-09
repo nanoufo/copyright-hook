@@ -62,5 +62,5 @@ ignore_commits_before: 2024-01-01
 - uses: pre-commit/action@v3.0.1
 ```
 
-### Running with [pre-commit.ci](pre-commit.ci)
+### Running with [pre-commit.ci](https://pre-commit.ci/)
 pre-commit.ci doesn't fetch git history so it is impossible to use it with this hook.
