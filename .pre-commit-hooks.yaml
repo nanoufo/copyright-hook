@@ -1,5 +1,5 @@
 - id: update-copyright
-  name: check copyright year
+  name: update-copyright
   entry: update-copyright
   language: python
   types:
